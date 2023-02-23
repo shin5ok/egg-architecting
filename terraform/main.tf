@@ -211,3 +211,12 @@ resource "google_project_iam_binding" "log_writer" {
     google_logging_project_sink.logging_to_bq.writer_identity,
   ]
 }
+
+output "external_ip_attached_to_gclb" {
+  value = google_compute_global_address.reserved_ip.address
+}
+
+output "cloud_run_embeded_url" {
+  value = google_cloud_run_service.game_api.status[0].url
+}
+
