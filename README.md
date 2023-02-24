@@ -108,6 +108,7 @@ show create table users_items;
 show create table items;
 select * from items;
 ```
+exit spanner-cli shell.
 
 8. Test it as local app.
 Run it locally.
