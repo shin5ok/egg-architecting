@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/go-redis/redis"
 )
 
@@ -10,8 +12,8 @@ type SimpleCache struct {
 }
 
 type SimpleCacher interface {
-	Get(key string) ([]byte, error)
-	Store(key, value string) error
+	Get(ctx context.Context, key string) ([]byte, error)
+	Store(ctx context.Context, key string, value []byte) error
 }
 
 func (v SimpleCache) New() *redis.Client {
@@ -23,10 +25,10 @@ func (v SimpleCache) New() *redis.Client {
 	return rdb
 }
 
-func (v SimpleCache) Get(key string) (string, error) {
+func (v SimpleCache) Get(ctx context.Context, key string) ([]byte, error) {
 	panic("not implemented") // TODO: Implement
 }
 
-func (v SimpleCache) Store(key string, value string) error {
+func (v SimpleCache) Store(ctx context.Context, key string, value []byte) error {
 	panic("not implemented") // TODO: Implement
 }
