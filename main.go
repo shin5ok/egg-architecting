@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/httplog"
 	"github.com/go-chi/render"
+	"github.com/go-redis/redis"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -19,6 +20,7 @@ import (
 var appName = "myapp"
 
 var spannerString = os.Getenv("SPANNER_STRING")
+var redisHost = os.Getenv("REDIS_HOST")
 var servicePort = os.Getenv("PORT")
 
 type Serving struct {
@@ -34,7 +36,15 @@ func main() {
 
 	ctx := context.Background()
 
-	client, err := newClient(ctx, spannerString)
+	rdb := redis.NewClient(&redis.Options{
+		Addr:        redisHost,
+		Password:    "",
+		DB:          0,
+		PoolSize:    10,
+		PoolTimeout: 30 * time.Second,
+	})
+
+	client, err := newClient(ctx, spannerString, rdb)
 	if err != nil {
 		log.Fatal(err)
 	}

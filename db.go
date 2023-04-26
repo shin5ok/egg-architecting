@@ -2,10 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"log"
 	"time"
 
+	"json"
+
 	"cloud.google.com/go/spanner"
+	"github.com/go-redis/redis"
 	"google.golang.org/api/iterator"
 )
 
@@ -21,22 +26,27 @@ type userParams struct {
 }
 
 type itemParams struct {
-	itemID    string
-	itemPrice int
+	itemID string
 }
 
 type dbClient struct {
-	sc *spanner.Client
+	sc    *spanner.Client
+	cache *redis.Client
 }
 
-func newClient(ctx context.Context, dbString string) (dbClient, error) {
+func init() {
+}
+
+func newClient(ctx context.Context, dbString string, redisClient *redis.Client) (dbClient, error) {
 
 	client, err := spanner.NewClient(ctx, dbString)
 	if err != nil {
 		return dbClient{}, err
 	}
+
 	return dbClient{
-		sc: client,
+		sc:    client,
+		cache: redisClient,
 	}, nil
 }
 
@@ -96,6 +106,17 @@ func (d dbClient) addItemToUser(ctx context.Context, w io.Writer, u userParams, 
 // get what items the user has
 func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]map[string]interface{}, error) {
 
+	key := fmt.Sprintf("userItems_%s", userID)
+	data, err := d.cache.Get(key).Result()
+	defer d.cache.Close()
+
+	if err != nil {
+		log.Println(err)
+	} else {
+		jsonData := json.Marshal(data)
+		return jsonData, nil
+	}
+
 	txn := d.sc.ReadOnlyTransaction()
 	defer txn.Close()
 	sql := `select users.name,items.item_name,user_items.item_id
@@ -135,6 +156,8 @@ func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]
 			})
 
 	}
+
+	_ = d.cache.Set(key, results, 10).Err()
 
 	return results, nil
 }
