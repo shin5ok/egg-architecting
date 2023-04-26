@@ -108,16 +108,16 @@ func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]
 
 	key := fmt.Sprintf("userItems_%s", userID)
 	data, err := d.cache.Get(key).Result()
-	defer d.cache.Close()
 
 	if err != nil {
-		log.Println(err)
+		log.Println(key, "Error", err)
 	} else {
 		results := []map[string]interface{}{}
 		err := json.Unmarshal([]byte(data), &results)
 		if err != nil {
 			log.Println(err)
 		}
+		log.Println(key, "from cache")
 		return results, nil
 	}
 
@@ -162,7 +162,10 @@ func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]
 	}
 
 	jsonedResults, _ := json.Marshal(results)
-	_ = d.cache.Set(key, string(jsonedResults), 10).Err()
+	err = d.cache.Set(key, string(jsonedResults), 10*time.Second).Err()
+	if err != nil {
+		log.Println(err)
+	}
 
 	return results, nil
 }
