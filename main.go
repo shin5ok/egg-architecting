@@ -48,7 +48,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer client.sc.Close()
+	defer rdb.Close()
 
 	s := Serving{
 		Client: client,
