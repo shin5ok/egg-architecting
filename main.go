@@ -42,6 +42,7 @@ func main() {
 		DB:          0,
 		PoolSize:    10,
 		PoolTimeout: 30 * time.Second,
+		DialTimeout: 1 * time.Second,
 	})
 
 	client, err := newClient(ctx, spannerString, rdb)
