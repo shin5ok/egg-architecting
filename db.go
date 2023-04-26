@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"json"
+	"encoding/json"
 
 	"cloud.google.com/go/spanner"
 	"github.com/go-redis/redis"
@@ -113,8 +113,12 @@ func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]
 	if err != nil {
 		log.Println(err)
 	} else {
-		jsonData := json.Marshal(data)
-		return jsonData, nil
+		results := []map[string]interface{}{}
+		err := json.Unmarshal([]byte(data), &results)
+		if err != nil {
+			log.Println(err)
+		}
+		return results, nil
 	}
 
 	txn := d.sc.ReadOnlyTransaction()
@@ -157,7 +161,8 @@ func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]
 
 	}
 
-	_ = d.cache.Set(key, results, 10).Err()
+	jsonedResults, _ := json.Marshal(results)
+	_ = d.cache.Set(key, string(jsonedResults), 10).Err()
 
 	return results, nil
 }
