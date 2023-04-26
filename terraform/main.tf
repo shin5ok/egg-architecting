@@ -256,3 +256,10 @@ output "cloud_run_embeded_url" {
   value = google_cloud_run_service.game_api.status[0].url
 }
 
+output "redis_private_ip_in_vpc" {
+  value = google_redis_instance.test_redis.host
+}
+
+output "redis_private_port_in_vpc" {
+  value = google_redis_instance.test_redis.port
+}
