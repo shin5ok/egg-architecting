@@ -21,6 +21,9 @@ locals {
     "compute.googleapis.com",
     "run.googleapis.com",
     "spanner.googleapis.com",
+    "secretmanager.googleapis.com",
+    "vpcaccess.googleapis.com",
+    "redis.googleapis.com",
   ])
 }
 
@@ -87,6 +90,39 @@ resource "google_cloud_run_service" "game_api" {
   }
   autogenerate_revision_name = true
   depends_on                 = [google_project_service.service]
+}
+
+resource "google_compute_network" "game_vpc" {
+  name                    = "my-network"
+  auto_create_subnetworks = true
+  # mtu = 1460
+  depends_on = [
+    google_project_service.service
+  ]
+}
+
+resource "google_vpc_access_connector" "test" {
+  name           = "test"
+  provider       = google-beta
+  region         = var.region
+  ip_cidr_range  = "10.8.0.0/28"
+  max_throughput = 300
+  network        = google_compute_network.game_vpc.name
+  depends_on     = [google_project_service.service]
+}
+
+resource "google_redis_instance" "test_redis" {
+  authorized_network      = google_compute_network.game_vpc.id
+  connect_mode            = "DIRECT_PEERING"
+  location_id             = var.zone
+  memory_size_gb          = 1
+  name                    = "test-redis"
+  project                 = var.project
+  read_replicas_mode      = "READ_REPLICAS_DISABLED"
+  redis_version           = "REDIS_6_X"
+  region                  = var.region
+  tier                    = "BASIC"
+  transit_encryption_mode = "DISABLED"
 }
 
 resource "google_cloud_run_service_iam_binding" "run_iam_binding" {
