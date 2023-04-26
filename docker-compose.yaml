@@ -10,6 +10,14 @@ services:
     networks:
       - game_api_network
 
+  redis:
+    image: redis:3
+    ports:
+      - 6379:6379
+      - 6378:6378
+    networks:
+      - game_api_network
+
 networks:
   game_api_network:
     name: game_api_network
