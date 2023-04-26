@@ -11,7 +11,7 @@ services:
       - game_api_network
 
   redis:
-    image: redis:3
+    image: redis:6
     ports:
       - 6379:6379
       - 6378:6378
