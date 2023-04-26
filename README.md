@@ -175,6 +175,7 @@ Add iam policy to access Cloud Spanner instances in your project.
 ```
 export SA=game-api@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=serviceAccount:$SA --role=roles/spanner.databaseUser
+gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=serviceAccount:$SA --role=roles/vpcaccess.user
 ```
 
 4. Create a spanner instance for production.
@@ -202,12 +203,18 @@ done
 spanner-cli -i test-instance -p $GOOGLE_CLOUD_PROJECT -d game
 ```
 
-6. Deploy a Cloud Run service.
+6. Deploy a Cloud Run service.  
+Before the deploy, set some shell variables.
+```
+VA=projects/$GOOGLE_CLOUD_PROJECT/locations/asia-northeast1/connectors/game-api-vpc-access
+REDIS_HOST=$(gcloud redis instances describe test-redis --region=asia-northeast1 --format=json | jq .host -r)
+```
+
 - Option1: With buildpacks
 ```
 gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
---set-env-vars=SPANNER_STRING=$SPANNER_STRING \
---service-account=$SA --source=.
+--set-env-vars=SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST \
+--vpc-connector=$VA --service-account=$SA --source=.
 ```
 - Option2: With Dockerfile as the general way  
   Create a repo on Artifact Registory and grant push on local env.  
@@ -225,8 +232,9 @@ docker push $IMAGE
   Deploy it to Cloud Run service.
 ```
 gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
---set-env-vars=SPANNER_STRING=$SPANNER_STRING \
---service-account=$SA --image $IMAGE
+--set-env-vars=SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST \
+--vpc-connector=$VA --service-account=$SA \
+--image $IMAGE
 ```
 
 7. Congratulation!!  
