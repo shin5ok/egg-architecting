@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"cloud.google.com/go/pubsub"
 	chiprometheus "github.com/766b/chi-prometheus"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -22,6 +23,14 @@ var appName = "myapp"
 var spannerString = os.Getenv("SPANNER_STRING")
 var redisHost = os.Getenv("REDIS_HOST")
 var servicePort = os.Getenv("PORT")
+var projectId = os.Getenv("GOOGLE_CLOUD_PROJECT")
+
+var async = os.Getenv("ASYNC")
+var asyncOption bool = func() bool {
+	return async != ""
+}()
+var topicName = os.Getenv("TOPIC_NAME")
+var rev = os.Getenv("CLOUD_RUN_REVISIONS")
 
 type Serving struct {
 	Client GameUserOperation
@@ -101,6 +110,23 @@ func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
 		errorRender(w, r, http.StatusInternalServerError, err)
 		return
 	}
+
+	client, err := pubsub.NewClient(ctx, projectId)
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close()
+	if topicName != "" {
+		var p = map[string]interface{}{"id": userID, "rev": rev}
+		log.Printf("%+v\n", p)
+		publishLog(client, topicName, p, asyncOption)
+
+	}
+
+	if err != nil {
+		panic(err)
+	}
+
 	render.JSON(w, r, results)
 }
 
