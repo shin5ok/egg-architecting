@@ -47,7 +47,11 @@ func main() {
 
 	ctx := context.Background()
 
-	pubsubClient, _ = pubsub.NewClient(ctx, projectId)
+	p, err := pubsub.NewClient(ctx, projectId)
+	if err != nil {
+		panic(err)
+	}
+	pubsubClient = p
 	defer pubsubClient.Close()
 
 	rdb := redis.NewClient(&redis.Options{
@@ -122,10 +126,6 @@ func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%+v\n", pubsubClient)
 		publishLog(pubsubClient, topicName, p, asyncOption)
 
-	}
-
-	if err != nil {
-		panic(err)
 	}
 
 	render.JSON(w, r, results)
