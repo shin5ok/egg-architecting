@@ -212,9 +212,7 @@ REDIS_HOST=$(gcloud redis instances describe test-redis --region=asia-northeast1
 
 - Option1: With buildpacks
 ```
-gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
---set-env-vars=SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST \
---vpc-connector=$VA --service-account=$SA --source=.
+gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 --set-env-vars=GOOGLE_CLOUD_PROJECT=$PROJECT,SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST --vpc-connector=$VA --service-account=$SA --cpu-throttling --source=.
 ```
 - Option2: With Dockerfile as the general way  
   Create a repo on Artifact Registory and grant push on local env.  
