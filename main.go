@@ -30,7 +30,7 @@ var asyncOption bool = func() bool {
 	return async != ""
 }()
 var topicName = os.Getenv("TOPIC_NAME")
-var rev = os.Getenv("CLOUD_RUN_REVISIONS")
+var rev = os.Getenv("CLOUD_RUN_REVISION")
 
 type Serving struct {
 	Client GameUserOperation
@@ -41,9 +41,14 @@ type User struct {
 	Id   string `json:"id"`
 }
 
+var pubsubClient *pubsub.Client
+
 func main() {
 
 	ctx := context.Background()
+
+	pubsubClient, _ = pubsub.NewClient(ctx, projectId)
+	defer pubsubClient.Close()
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:        redisHost,
@@ -111,15 +116,11 @@ func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := pubsub.NewClient(ctx, projectId)
-	if err != nil {
-		panic(err)
-	}
-	defer client.Close()
 	if topicName != "" {
 		var p = map[string]interface{}{"id": userID, "rev": rev}
 		log.Printf("%+v\n", p)
-		publishLog(client, topicName, p, asyncOption)
+		log.Printf("%+v\n", pubsubClient)
+		publishLog(pubsubClient, topicName, p, asyncOption)
 
 	}
 
