@@ -4,24 +4,28 @@ import (
 	"context"
 	"log"
 
+	"encoding/json"
+
 	"cloud.google.com/go/pubsub"
 )
 
-func publishLog(client *pubsub.Client, topicName string, data []byte, async bool) error {
+func publishLog(client *pubsub.Client, topicName string, data map[string]interface{}, async bool) error {
+
+	jsonData, _ := json.Marshal(data)
 
 	message := &pubsub.Message{
-		Data: data,
+		Data: jsonData,
 	}
 
 	topic := client.Topic(topicName)
 	if async {
 		go func() {
 			res := topic.Publish(context.Background(), message)
-			log.Printf("%+v\n", res)
+			log.Printf("async %+v\n", res)
 		}()
 	} else {
 		res := topic.Publish(context.Background(), message)
-		log.Printf("%+v\n", res)
+		log.Printf("sync %+v\n", res)
 	}
 
 	return nil
