@@ -30,7 +30,7 @@ var asyncOption bool = func() bool {
 	return async != ""
 }()
 var topicName = os.Getenv("TOPIC_NAME")
-var rev = os.Getenv("CLOUD_RUN_REVISION")
+var rev = os.Getenv("K_REVISION")
 
 type Serving struct {
 	Client GameUserOperation
