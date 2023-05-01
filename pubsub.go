@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"encoding/json"
@@ -10,6 +11,10 @@ import (
 )
 
 func publishLog(client *pubsub.Client, topicName string, data map[string]interface{}, async bool) error {
+
+	if topicName == "" {
+		return fmt.Errorf("topic name is empty")
+	}
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
