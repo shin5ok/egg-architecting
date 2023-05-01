@@ -120,13 +120,9 @@ func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if topicName != "" {
-		var p = map[string]interface{}{"id": userID, "rev": rev}
-		log.Printf("%+v\n", p)
-		log.Printf("%+v\n", pubsubClient)
-		publishLog(pubsubClient, topicName, p, asyncOption)
-
-	}
+	// publish log, just for test
+	var p = map[string]interface{}{"id": userID, "rev": rev}
+	publishLog(pubsubClient, topicName, p, asyncOption)
 
 	render.JSON(w, r, results)
 }
