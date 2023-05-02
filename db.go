@@ -34,9 +34,6 @@ type dbClient struct {
 	cache *redis.Client
 }
 
-func init() {
-}
-
 func newClient(ctx context.Context, dbString string, redisClient *redis.Client) (dbClient, error) {
 
 	client, err := spanner.NewClient(ctx, dbString)

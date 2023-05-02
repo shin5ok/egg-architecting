@@ -18,19 +18,26 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-var appName = "myapp"
+var (
+	appName       = "myapp"
+	spannerString = os.Getenv("SPANNER_STRING")
+	redisHost     = os.Getenv("REDIS_HOST")
+	servicePort   = os.Getenv("PORT")
+	projectId     = os.Getenv("GOOGLE_CLOUD_PROJECT")
+)
 
-var spannerString = os.Getenv("SPANNER_STRING")
-var redisHost = os.Getenv("REDIS_HOST")
-var servicePort = os.Getenv("PORT")
-var projectId = os.Getenv("GOOGLE_CLOUD_PROJECT")
-
-var async = os.Getenv("ASYNC")
-var asyncOption bool = func() bool {
-	return async != ""
-}()
-var topicName = os.Getenv("TOPIC_NAME")
-var rev = os.Getenv("K_REVISION")
+/*
+this is to configure option of using pubsub
+*/
+var (
+	async            = os.Getenv("ASYNC")
+	asyncOption bool = func() bool {
+		return async != ""
+	}()
+	topicName    = os.Getenv("TOPIC_NAME")
+	rev          = os.Getenv("K_REVISION")
+	pubsubClient *pubsub.Client
+)
 
 type Serving struct {
 	Client GameUserOperation
@@ -40,8 +47,6 @@ type User struct {
 	Name string `json:"name"`
 	Id   string `json:"id"`
 }
-
-var pubsubClient *pubsub.Client
 
 func main() {
 
