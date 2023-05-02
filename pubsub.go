@@ -4,13 +4,19 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"encoding/json"
 
 	"cloud.google.com/go/pubsub"
 )
 
-func publishLog(client *pubsub.Client, topicName string, data map[string]interface{}, async bool) error {
+var (
+	topicName    = os.Getenv("TOPIC_NAME")
+	pubsubClient *pubsub.Client
+)
+
+func publishLog(client *pubsub.Client, topicName string, data map[string]interface{}) error {
 
 	if topicName == "" {
 		return fmt.Errorf("topic name is empty")
@@ -28,15 +34,10 @@ func publishLog(client *pubsub.Client, topicName string, data map[string]interfa
 
 	topic := client.Topic(topicName)
 	ctx := context.Background()
-	if async {
-		go func() {
-			res := topic.Publish(ctx, message)
-			log.Printf("Async %+v\n", res)
-		}()
-	} else {
+	go func() {
 		res := topic.Publish(ctx, message)
-		log.Printf("Sync %+v\n", res)
-	}
+		log.Printf("Async %+v\n", res)
+	}()
 
 	return nil
 }
