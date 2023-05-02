@@ -24,18 +24,17 @@ var (
 	redisHost     = os.Getenv("REDIS_HOST")
 	servicePort   = os.Getenv("PORT")
 	projectId     = os.Getenv("GOOGLE_CLOUD_PROJECT")
+	rev           = os.Getenv("K_REVISION")
 )
 
 /*
 this is to configure option of using pubsub
 */
 var (
-	async            = os.Getenv("ASYNC")
 	asyncOption bool = func() bool {
-		return async != ""
+		return os.Getenv("ASYNC") != ""
 	}()
 	topicName    = os.Getenv("TOPIC_NAME")
-	rev          = os.Getenv("K_REVISION")
 	pubsubClient *pubsub.Client
 )
 
