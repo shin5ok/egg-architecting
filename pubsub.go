@@ -4,16 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"encoding/json"
 
 	"cloud.google.com/go/pubsub"
-)
-
-var (
-	topicName    = os.Getenv("TOPIC_NAME")
-	pubsubClient *pubsub.Client
 )
 
 func publishLog(client *pubsub.Client, topicName string, data map[string]interface{}) error {

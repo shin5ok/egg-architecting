@@ -27,6 +27,11 @@ var (
 	rev           = os.Getenv("K_REVISION")
 )
 
+var (
+	topicName    = os.Getenv("TOPIC_NAME")
+	pubsubClient *pubsub.Client
+)
+
 type Serving struct {
 	Client GameUserOperation
 }
@@ -114,8 +119,10 @@ func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// publish log, just for test
-	var p = map[string]interface{}{"id": userID, "rev": rev}
-	publishLog(pubsubClient, topicName, p)
+	if topicName != "" {
+		p := map[string]interface{}{"id": userID, "rev": rev}
+		publishLog(pubsubClient, topicName, p)
+	}
 
 	render.JSON(w, r, results)
 }
