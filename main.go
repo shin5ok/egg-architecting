@@ -28,8 +28,9 @@ var (
 )
 
 var (
-	topicName    = os.Getenv("TOPIC_NAME")
-	pubsubClient *pubsub.Client
+	topicName      = os.Getenv("TOPIC_NAME")
+	pubsubClient   *pubsub.Client
+	authHeaderName = os.Getenv("AUTH_HEADER")
 )
 
 type Serving struct {
@@ -86,8 +87,9 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(httplog.RequestLogger(httpLogger))
-	r.Use(m)
+	r.Use(headerAuth)
 
+	r.Use(m)
 	r.Handle("/metrics", promhttp.Handler())
 
 	r.Get("/ping", s.pingPong)
@@ -157,4 +159,19 @@ func (s Serving) addItemToUser(w http.ResponseWriter, r *http.Request) {
 func (s Serving) pingPong(w http.ResponseWriter, r *http.Request) {
 	render.Status(r, http.StatusOK)
 	render.PlainText(w, r, "Pong\n")
+}
+
+func headerAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if authHeaderName != "" {
+			auth := r.Header.Get(authHeaderName)
+			if auth == "" {
+				// w.WriteHeader(http.StatusForbidden)
+				log.Printf("Forbidden request info: %+v", r)
+				http.Error(w, "You're NOT permitted to enter here", http.StatusForbidden)
+				return
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
 }
