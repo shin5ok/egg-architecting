@@ -102,9 +102,9 @@ resource "google_compute_network" "game_vpc" {
   ]
 }
 
-resource "google_vpc_access_connector" "test" {
-  name           = "test"
-  provider       = google-beta
+resource "google_vpc_access_connector" "game-api-vpc-access" {
+  name           = "game-api-vpc-access"
+  provider       = google
   region         = var.region
   ip_cidr_range  = "10.8.0.0/28"
   max_throughput = 300
