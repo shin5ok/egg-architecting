@@ -24,6 +24,7 @@ locals {
     "secretmanager.googleapis.com",
     "vpcaccess.googleapis.com",
     "redis.googleapis.com",
+    "certificatemanager.googleapis.com",
   ])
 }
 
@@ -204,9 +205,7 @@ resource "google_compute_target_https_proxy" "run_https_proxy" {
   name = "run-https-proxy"
 
   url_map = google_compute_url_map.run_url_map.id
-  ssl_certificates = [
-    google_compute_managed_ssl_certificate.managed_cert.id
-  ]
+  certificate_map = "//certificatemanager.googleapis.com/projects/${var.project}/locations/global/certificateMaps/cert-map"
   depends_on = [
     google_project_service.compute_service
   ]
@@ -246,6 +245,60 @@ resource "google_project_iam_binding" "log_writer" {
   members = [
     google_logging_project_sink.logging_to_bq.writer_identity,
   ]
+}
+
+resource "google_certificate_manager_certificate" "test" {
+  name        = "dns-cert"
+  description = "test cert"
+  managed {
+    domains = [
+      google_certificate_manager_dns_authorization.test.domain,
+      ]
+    dns_authorizations = [
+      google_certificate_manager_dns_authorization.test.id,
+      ]
+  }
+  depends_on = [
+    google_project_service.service,
+  ]
+}
+
+resource "google_certificate_manager_dns_authorization" "test" {
+  name        = "dns-auth"
+  description = "The default dnss"
+  domain      = var.domain
+  depends_on = [
+    google_project_service.service,
+  ]
+}
+
+resource "google_certificate_manager_certificate_map" "test" {
+  name        = "cert-map"
+  description = "My acceptance test certificate map"
+  labels      = {
+    "terraform" : true,
+  }
+  depends_on = [
+    google_project_service.service,
+  ]
+}
+
+resource "google_certificate_manager_certificate_map_entry" "test" {
+  name        = "cert-map-entry"
+  description = "My acceptance test certificate map entry"
+  map = google_certificate_manager_certificate_map.test.name
+  labels      = {
+    "terraform" : true,
+  }
+  certificates = [google_certificate_manager_certificate.test.id]
+  matcher = "PRIMARY"
+  depends_on = [
+    google_certificate_manager_certificate_map.test,
+  ]
+}
+
+output "dns_auth" {
+    value = google_certificate_manager_dns_authorization.test.dns_resource_record
 }
 
 output "external_ip_attached_to_gclb" {
