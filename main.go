@@ -85,6 +85,7 @@ func main() {
 	// r.Use(middleware.Throttle(8))
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Recoverer)
+	r.Use(httplog.RequestLogger(httpLogger))
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Use(httplog.RequestLogger(httpLogger))
 	r.Use(headerAuth)
