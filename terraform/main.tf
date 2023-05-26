@@ -165,18 +165,6 @@ resource "google_compute_global_address" "reserved_ip" {
   ]
 }
 
-resource "google_compute_managed_ssl_certificate" "managed_cert" {
-  provider = google-beta
-
-  name = "managed-cert"
-  managed {
-    domains = ["${var.domain}"]
-  }
-  depends_on = [
-    google_project_service.compute_service
-  ]
-}
-
 resource "google_compute_backend_service" "run_backend" {
   name = "run-backend"
 
@@ -310,9 +298,6 @@ output "cloud_run_embeded_url" {
 }
 
 output "redis_private_ip_in_vpc" {
-  value = google_redis_instance.test_redis.host
+  value = "${google_redis_instance.test_redis.host}:${google_redis_instance.test_redis.port}"
 }
 
-output "redis_private_port_in_vpc" {
-  value = google_redis_instance.test_redis.port
-}
