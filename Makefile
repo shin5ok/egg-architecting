@@ -21,6 +21,7 @@ schema:
 	for schema in schemas/*ddl.sql schemas/*dml.sql ; do spanner-cli -i $(SPANNER_INSTANCE) -d $(SPANNER_DATABASE) -p $(GOOGLE_CLOUD_PROJECT) < $${schema} ; done
 
 .PHONY: app
+REDIS_HOST := $(shell ( cd terraform; terraform output -raw redis_private_ip_in_vpc ) )
 app:
 	@echo "Building and Deploying Cloud Run service"
 	gcloud run deploy game-api --allow-unauthenticated --region=$(REGION) --set-env-vars=GOOGLE_CLOUD_PROJECT=$(GOOGLE_CLOUD_PROJECT),SPANNER_STRING=$(SPANNER_STRING),REDIS_HOST=$(REDIS_HOST) --vpc-connector=$(VA) --service-account=$(SA) --cpu-throttling --source=. --quiet
