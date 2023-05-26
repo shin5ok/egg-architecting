@@ -7,8 +7,7 @@ SA := game-api@$(GOOGLE_CLOUD_PROJECT).iam.gserviceaccount.com
 VA := projects/$(GOOGLE_CLOUD_PROJECT)/locations/$(REGION)/connectors/game-api-vpc-access
 
 .PHONY: all
-all:
-	infra schema app
+all: infra schema app
 
 .PHONY: infra
 infra:
@@ -23,7 +22,7 @@ schema:
 .PHONY: app
 app:
 	@echo "Building and Deploying Cloud Run service"
-	gcloud run deploy game-api --allow-unauthenticated --region=$(REGION) --set-env-vars=GOOGLE_CLOUD_PROJECT=$(GOOGLE_CLOUD_PROJECT),SPANNER_STRING=$(SPANNER_STRING),REDIS_HOST=$(REDIS_HOST) --vpc-connector=$(VA) --service-account=$(SA) --cpu-throttling --source=.
+	gcloud run deploy game-api --allow-unauthenticated --region=$(REGION) --set-env-vars=GOOGLE_CLOUD_PROJECT=$(GOOGLE_CLOUD_PROJECT),SPANNER_STRING=$(SPANNER_STRING),REDIS_HOST=$(REDIS_HOST) --vpc-connector=$(VA) --service-account=$(SA) --cpu-throttling --source=. --quiet
 
 .PHONY: clean
 clean:
