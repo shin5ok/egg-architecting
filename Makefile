@@ -8,6 +8,7 @@ VA := projects/$(GOOGLE_CLOUD_PROJECT)/locations/$(REGION)/connectors/game-api-v
 
 .PHONY: all
 all: infra schema app
+	( cd terraform/; terraform output )
 
 .PHONY: infra
 infra:
