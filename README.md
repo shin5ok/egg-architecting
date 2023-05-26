@@ -5,7 +5,7 @@
 - Local Development
 - Deploy to production
 - Transfer logging to Google BigQuery
-- **Appendix**: Attach Google Cloud Load Balancer with Google Managed SSL certificate
+- **Appendix**: Attach Google Cloud Load Balancer with Certificate Manager
 
 ![architecture_diagram](diagram/production-env.png)
 
@@ -145,6 +145,8 @@ go test -v
 ```
 
 ## Deploy the app to Google Cloud
+**If you'd like to make it automatically,** jump to [here](#just-do-it-all-using-terraform-and-more).
+
 
 1. Switch profile to Production project.
 ```
@@ -266,7 +268,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID --member=$LOGSA --role=roles/
 That's all, you can access the api and you will see all logs in BigQuery tables.  
 Maybe you need to wait for a few minutes at the first time until Log Sink started.
 
-## **Appendix**: Attach Google Cloud Load Balancer with Google Managed SSL certificate
+## **Appendix**: Attach Google Cloud Load Balancer with Certificate Manager
 ### Note: requirement to pass the step.
 Need to prepare a domain zone that you have authorization of because it's going to use your custom domain.
 
@@ -352,3 +354,19 @@ gcloud dns managed-zones describe <your-zone-name> --format=json | jq -r .nameSe
 
 It also take a while to become to active the certification.  
 You might see 4xx/5xx response or SSL error until that.
+
+## Just do it all using terraform and more
+1. Prepare environment variables
+```
+export TF_VAR_project=<your Google Cloud project, eg: my-project-xxxxxx>
+export TF_VAR_domain=<your FQDN you want to use>
+export TF_VAR_gcs=<GCS bucket name, eg: my-bucket-xxxxxx>
+export TF_VAR_region=<Google Cloud reigon, eg: asia-northeast1>
+export TF_VAR_zone=<Google Cloud zone, eg: asia-northeast1-a>
+```
+
+2. Run it
+```
+make clean
+make all
+```
