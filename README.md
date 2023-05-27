@@ -362,8 +362,8 @@ You might see 4xx/5xx response or SSL error until that.
 export TF_VAR_project=<your Google Cloud project, eg: my-project-xxxxxx>
 export TF_VAR_domain=<your FQDN you want to use>
 export TF_VAR_gcs=<GCS bucket name, eg: my-bucket-xxxxxx>
-export TF_VAR_region=<Google Cloud reigon, eg: asia-northeast1>
-export TF_VAR_zone=<Google Cloud zone, eg: asia-northeast1-a>
+export TF_VAR_region=asia-northeast1
+export TF_VAR_zone=asia-northeast1-a
 ```
 
 2. Run it
