@@ -164,9 +164,9 @@ func Test_getUserItems(t *testing.T) {
 	handler := http.HandlerFunc(fakeServing.getUserItems)
 	handler.ServeHTTP(rr, newReq)
 
-	// if status := rr.Code; status != http.StatusOK {
-	// 	t.Errorf("Expected: %d. Got: %d, Message: %s, Request: %+v", http.StatusOK, rr.Code, rr.Body, req)
-	// }
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("Expected: %d. Got: %d, Message: %s, Request: %+v", http.StatusOK, rr.Code, rr.Body, req)
+	}
 }
 
 func Test_cleaning(t *testing.T) {
