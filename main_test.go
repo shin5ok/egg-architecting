@@ -46,10 +46,7 @@ func genStr() string {
 }
 
 func init() {
-	/*
-	 for local emulator:
-	 export SPANNER_STRING=projects/your-project-id/instances/test-instance/databases/game-dummy
-	*/
+
 	log.Println("Creating " + fakeDbString)
 
 	if match, _ := regexp.MatchString("^projects/your-project-id/", fakeDbString); match {
