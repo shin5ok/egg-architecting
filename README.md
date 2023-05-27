@@ -56,14 +56,14 @@ gcloud config set api_endpoint_overrides/spanner http://localhost:9020/
 ```
 
 2. Run Cloud Spanner emulator.
-If your 'docker' doesn't have 'compose' sub command, follow [the doc](https://docs.docker.com/compose/install/linux/#install-using-the-repository) to install compose plugin.  
 ```
 docker compose up -d spanner
 ```
 - See here to understand the limitation of Cloud Spanner emulator.  
 https://cloud.google.com/spanner/docs/emulator?hl=ja#limitations_and_differences
 - Notice: You might use old 'docker-compose' or 'docker'.  
-Check if the version support some features we use.
+Check if the version support some features.  
+If your 'docker' doesn't have 'compose' sub command, follow [the doc](https://docs.docker.com/compose/install/linux/#install-using-the-repository) to install compose plugin.  
 
 4. Set environment variable for the Cloud Spanner emulator.
 ```
