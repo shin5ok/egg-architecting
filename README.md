@@ -55,9 +55,9 @@ gcloud config set project your-project-id
 gcloud config set api_endpoint_overrides/spanner http://localhost:9020/
 ```
 
-2. Run Cloud Spanner emulator.
+2. Run Cloud Spanner emulator and Redis.
 ```
-docker compose up -d spanner
+docker compose up -d
 ```
 - See here to understand the limitation of Cloud Spanner emulator.  
 https://cloud.google.com/spanner/docs/emulator?hl=ja#limitations_and_differences
