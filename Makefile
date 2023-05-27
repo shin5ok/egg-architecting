@@ -1,8 +1,8 @@
 SPANNER_INSTANCE := test-instance
 SPANNER_DATABASE := game
 SPANNER_STRING := projects/$(GOOGLE_CLOUD_PROJECT)/instances/$(SPANNER_INSTANCE)/databases/$(SPANNER_DATABASE)
-REGION := $(TF_VAR_region)
-ZONE := $(TF_VAR_zone)
+REGION := asia-northeast1
+ZONE := asia-northeast1-a
 SA := game-api@$(GOOGLE_CLOUD_PROJECT).iam.gserviceaccount.com
 VA := projects/$(GOOGLE_CLOUD_PROJECT)/locations/$(REGION)/connectors/game-api-vpc-access
 
@@ -31,3 +31,6 @@ clean:
 	@echo "Cleanup states of terraform that were created previously"
 	rm -f terraform/*tfstate*
 
+.PHONY: p
+p:
+	@echo "$(REGION)"
