@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 
+	"cloud.google.com/go/spanner"
 	database "cloud.google.com/go/spanner/admin/database/apiv1"
 	adminpb "google.golang.org/genproto/googleapis/spanner/admin/database/v1"
 )
@@ -41,6 +42,36 @@ func InitData(ctx context.Context, db string, files []string) error {
 	}
 	if _, err := op.Wait(ctx); err != nil {
 		return err
+	}
+	return nil
+}
+
+// func InitData(ctx context.Context, db string, files []string) error {
+func MakeData(ctx context.Context, db string, files []string) error {
+	dataClient, err := spanner.NewClient(ctx, db)
+	if err != nil {
+		return err
+	}
+	defer dataClient.Close()
+
+	for _, file := range files {
+		sqlData, err := os.ReadFile(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err = dataClient.ReadWriteTransaction(ctx, func(ctx context.Context, txn *spanner.ReadWriteTransaction) error {
+			stmt := spanner.Statement{
+				SQL: string(sqlData),
+			}
+			_, err := txn.Update(ctx, stmt)
+			if err != nil {
+				return err
+			}
+			return err
+		})
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
