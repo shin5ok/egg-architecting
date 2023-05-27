@@ -1,8 +1,8 @@
 SPANNER_INSTANCE := test-instance
 SPANNER_DATABASE := game
 SPANNER_STRING := projects/$(GOOGLE_CLOUD_PROJECT)/instances/$(SPANNER_INSTANCE)/databases/$(SPANNER_DATABASE)
-REGION := asia-northeast1
-ZONE := asia-northeast1-a
+REGION := $(TF_VAR_region)
+ZONE := $(TF_VAR_zone)
 SA := game-api@$(GOOGLE_CLOUD_PROJECT).iam.gserviceaccount.com
 VA := projects/$(GOOGLE_CLOUD_PROJECT)/locations/$(REGION)/connectors/game-api-vpc-access
 
