@@ -34,7 +34,7 @@ export PRODUCTION_PROJECT=$GOOGLE_CLOUD_PROJECT
 
 4. Clone this code to your local.
 ```
-git clone https://github.com/shin5ok/egg6-architecting
+git clone https://github.com/shin5ok/egg7-architecting
 ```
 
 ## Local development
@@ -56,6 +56,7 @@ gcloud config set api_endpoint_overrides/spanner http://localhost:9020/
 ```
 
 2. Run Cloud Spanner emulator.
+If your 'docker' doesn't have 'compose' sub command, follow [the doc](https://docs.docker.com/compose/install/linux/#install-using-the-repository) to install compose plugin.  
 ```
 docker compose up -d spanner
 ```
@@ -150,7 +151,7 @@ go test -v
 
 1. Switch profile to Production project.
 ```
-gcloud config configurations create egg6-3
+gcloud config configurations create egg7-3
 gcloud config set project $PRODUCTION_PROJECT
 ```
 Run this command in your shell, just in case.
