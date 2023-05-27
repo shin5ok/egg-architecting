@@ -1,4 +1,4 @@
-module github.com/shin5ok/egg6-architecting
+module github.com/shin5ok/egg7-architecting
 
 go 1.19
 
