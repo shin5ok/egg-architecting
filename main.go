@@ -29,8 +29,8 @@ var (
 
 var (
 	topicName      = os.Getenv("TOPIC_NAME")
-	pubsubClient   *pubsub.Client
 	authHeaderName = os.Getenv("AUTH_HEADER")
+	pubsubClient   *pubsub.Client
 )
 
 type Serving struct {
