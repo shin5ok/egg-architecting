@@ -357,7 +357,14 @@ It also take a while to become to active the certification.
 You might see 4xx/5xx response or SSL error until that.
 
 ## Just do it all using terraform and more
-1. Prepare environment variables
+1. Make sure you have the latest terraform, and initilize it before using it
+See [here](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli).
+```
+cd terraform/
+terraform init
+```
+
+2. Prepare environment variables
 ```
 export TF_VAR_project=<your Google Cloud project, eg: my-project-xxxxxx>
 export TF_VAR_domain=<your FQDN you want to use>
@@ -366,7 +373,7 @@ export TF_VAR_region=asia-northeast1
 export TF_VAR_zone=asia-northeast1-a
 ```
 
-2. Run it
+3. Run it
 ```
 make clean
 make all
