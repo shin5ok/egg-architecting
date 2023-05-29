@@ -30,7 +30,3 @@ app:
 clean:
 	@echo "Cleanup states of terraform that were created previously"
 	rm -f terraform/*tfstate*
-
-.PHONY: p
-p:
-	@echo "$(REGION)"
