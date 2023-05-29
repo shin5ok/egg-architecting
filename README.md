@@ -358,7 +358,7 @@ You might see 4xx/5xx response or SSL error until that.
 
 ## Just do it all using terraform and more
 1. Make sure you have the latest terraform, and initilize it before using it
-See [here](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli).
+See [here](https://developer.hashicorp.com/terraform/downloads).
 ```
 cd terraform/
 terraform init
