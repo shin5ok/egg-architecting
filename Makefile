@@ -7,7 +7,7 @@ SA := game-api@$(GOOGLE_CLOUD_PROJECT).iam.gserviceaccount.com
 VA := projects/$(GOOGLE_CLOUD_PROJECT)/locations/$(REGION)/connectors/game-api-vpc-access
 
 .PHONY: all
-all: infra schema app
+all: infra schema repo app
 	( cd terraform/; terraform output )
 
 .PHONY: infra
@@ -26,7 +26,13 @@ app:
 	@echo "Building and Deploying Cloud Run service"
 	gcloud run deploy game-api --allow-unauthenticated --region=$(REGION) --set-env-vars=GOOGLE_CLOUD_PROJECT=$(GOOGLE_CLOUD_PROJECT),SPANNER_STRING=$(SPANNER_STRING),REDIS_HOST=$(REDIS_HOST) --vpc-connector=$(VA) --service-account=$(SA) --cpu-throttling --source=. --quiet
 
+.PHONY: repo
+repo:
+	gcloud artifacts repositories create --repository-format=docker --location=$(REGION) my-app
+	gcloud auth configure-docker $(REGION)-docker.pkg.dev
+
 .PHONY: clean
 clean:
 	@echo "Cleanup states of terraform that were created previously"
 	rm -f terraform/*tfstate*
+
