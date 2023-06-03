@@ -25,6 +25,7 @@ locals {
     "vpcaccess.googleapis.com",
     "redis.googleapis.com",
     "certificatemanager.googleapis.com",
+    "artifactregistry.googleapis.com",
   ])
 }
 
@@ -154,7 +155,8 @@ resource "google_compute_region_network_endpoint_group" "run_neg" {
     service = google_cloud_run_service.game_api.name
   }
   depends_on = [
-    google_project_service.compute_service
+    google_project_service.compute_service,
+    google_cloud_run_service.game_api
   ]
 }
 
@@ -293,7 +295,7 @@ output "external_ip_attached_to_gclb" {
   value = google_compute_global_address.reserved_ip.address
 }
 
-output "cloud_run_embeded_url" {
+output "url_cloud_run_embeded" {
   value = google_cloud_run_service.game_api.status[0].url
 }
 
@@ -301,3 +303,6 @@ output "redis_private_ip_in_vpc" {
   value = "${google_redis_instance.test_redis.host}:${google_redis_instance.test_redis.port}"
 }
 
+output "url_for_service" {
+  value = "https://${var.domain}"
+}
