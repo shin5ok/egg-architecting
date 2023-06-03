@@ -375,7 +375,13 @@ export TF_VAR_zone=asia-northeast1-a
 
 3. Run it
 Make sure you are in top of repo directory, which has the Makefile,
+
+- Clean up previous state files and something, just in case
 ```
 make clean
+unset SPANNER_EMULATOR_HOST
+```
+- Build and deploy all infrastrucures and apps
+```
 make all
 ```
