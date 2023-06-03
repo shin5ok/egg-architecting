@@ -170,7 +170,7 @@ func Test_cleaning(t *testing.T) {
 	t.Cleanup(
 		func() {
 			if noCleanup {
-				t.Log("skip cleanup")
+				t.Log("###########", "skip cleanup")
 				return
 			}
 			ctx := context.Background()
