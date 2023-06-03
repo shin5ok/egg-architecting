@@ -374,6 +374,7 @@ export TF_VAR_zone=asia-northeast1-a
 ```
 
 3. Run it
+Make sure you are in top of repo directory, which has the Makefile,
 ```
 make clean
 make all
