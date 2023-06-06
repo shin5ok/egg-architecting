@@ -1,11 +1,14 @@
 # README
 
 ## コンテンツ
+- スタート前の準備
+- ***とにかく急いで構築したい人向け***（terraform を利用）
 - アプリケーションのデプロイ
 - Google BigQuery へのログの転送
 - **オプション**: マネージド証明書付きの Google Cloud LoadBalancer のデプロイ
 
-![architecture_diagram](diagram/production-env.png)
+![architecture_diagram](diagram/egg7architecture.png)
+
 
 ## スタート前の準備
 ### 1. プロジェクトへのサインイン
@@ -22,13 +25,53 @@ export PATH=$PATH:~/go/bin
 ```
 ### 3. 環境変数の設定
 ```
-export GOOGLE_CLOUD_PROJECT=<your-project>
+export GOOGLE_CLOUD_PROJECT=プロジェクトID
 ```
 
 ### 4. リポジトリをローカルへ clone
 ```
 git clone https://github.com/shin5ok/egg6-architecting
 ```
+---
+
+## とにかく急いで構築したい人向け
+1. terraform を[インストール](https://developer.hashicorp.com/terraform/downloads)します
+
+2. terraform の環境を初期化します
+```
+cd terraform/
+terraform init
+```
+
+3. 環境変数をセット
+ご自分の環境に合わせて準備してください
+```
+export TF_VAR_project=<Google Cloud のプロジェクトID, 例: my-project-xxxxxx>
+export TF_VAR_domain=<アクセスに使いたいFQDN>
+export TF_VAR_gcs=<Google Cloud Storageの名前, 例: my-bucket-xxxxxx>
+export TF_VAR_region=asia-northeast1
+export TF_VAR_zone=asia-northeast1-a
+```
+
+3. 実行
+自分がリポジトリのトップディレクトリにいることを確認して実行します  
+（Makefile と同じディレクトリです）
+
+- 念のため、環境をクリーンアップ
+```
+make clean
+unset SPANNER_EMULATOR_HOST
+```
+- Google Cloud の環境とアプリケーションをデプロイします
+```
+make all
+```
+
+以上、完了です  
+テストしましょう
+
+---
+
 
 ## アプリケーションのデプロイ
 
