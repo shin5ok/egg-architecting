@@ -102,7 +102,7 @@ func (d dbClient) addItemToUser(ctx context.Context, w io.Writer, u userParams, 
 	return err
 }
 
-// get what items the user has
+// get items the user has
 func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]map[string]interface{}, error) {
 
 	key := fmt.Sprintf("userItems_%s", userID)
