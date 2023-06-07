@@ -7,7 +7,7 @@
 - Google BigQuery へのログの転送
 - **オプション**: マネージド証明書付きの Google Cloud LoadBalancer のデプロイ
 
-![architecture_diagram](diagram/egg7ja.png)
+![architecture_diagram](diagram/egg7simple.png)
 
 
 ## スタート前の準備
