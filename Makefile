@@ -34,5 +34,5 @@ repo:
 .PHONY: clean
 clean:
 	@echo "Cleanup states of terraform that were created previously"
-	rm -f terraform/*tfstate*
+	rm -f terraform/terraform.tfstate terraform/terraform.tfstate.backup
 
