@@ -7,7 +7,7 @@
 - Transfer logging to Google BigQuery
 - **Appendix**: Attach Google Cloud Load Balancer with Certificate Manager
 
-![architecture_diagram](/diagram/egg7architecture.png)
+![architecture_diagram](/diagram/egg.png)
 
 ## Let's get started with some preparation.
 1. Sign in to your project.
