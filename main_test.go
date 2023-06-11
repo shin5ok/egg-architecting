@@ -20,7 +20,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-redis/redis"
 	gonanoid "github.com/matoous/go-nanoid"
-	"github.com/shin5ok/egg7-architecting/testutil"
+	"github.com/shin5ok/egg-architecting/testutil"
 	"github.com/stretchr/testify/assert"
 )
 

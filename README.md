@@ -7,7 +7,7 @@
 - Transfer logging to Google BigQuery
 - **Appendix**: Attach Google Cloud Load Balancer with Certificate Manager
 
-![architecture_diagram](diagram/egg7architecture.png)
+![architecture_diagram](/diagram/egg7architecture.png)
 
 ## Let's get started with some preparation.
 1. Sign in to your project.
@@ -34,12 +34,12 @@ export PRODUCTION_PROJECT=$GOOGLE_CLOUD_PROJECT
 
 4. Clone this code to your local.
 ```
-git clone https://github.com/shin5ok/egg7-architecting
+git clone https://github.com/shin5ok/egg-architecting
 ```
 
 ## Local development
 
-![local](diagram/local-env.png)
+![local](/diagram/local-env.png)
 
 1. Prepare for local development.
 
@@ -151,7 +151,7 @@ go test -v
 
 1. Switch profile to Production project.
 ```
-gcloud config configurations create egg7-3
+gcloud config configurations create egg-test
 gcloud config set project $PRODUCTION_PROJECT
 ```
 Run this command in your shell, just in case.
