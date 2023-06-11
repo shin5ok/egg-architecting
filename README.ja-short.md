@@ -30,7 +30,7 @@ export GOOGLE_CLOUD_PROJECT=プロジェクトID
 
 ### 4. リポジトリをローカルへ clone
 ```
-git clone https://github.com/shin5ok/egg6-architecting
+git clone https://github.com/shin5ok/egg-architecting
 ```
 ---
 
@@ -77,7 +77,7 @@ make all
 
 ### 1. gcloud コマンドの環境作成と設定
 ```
-gcloud config configurations create egg6-3
+gcloud config configurations create egg-test
 gcloud config set project $GOOGLE_CLOUD_PROJECT
 ```
 
@@ -113,7 +113,7 @@ gcloud spanner databases create --instance test-instance game
 ```
 #### スキーマを作成し、初期データを登録
 ```
-for schema in ./schemas/*.sql;
+for schema in ./schemas/*ddl.sql ./schemas/*dml.sql;
 do
     spanner-cli -p $GOOGLE_CLOUD_PROJECT -i test-instance -d game < $schema
 done
@@ -140,7 +140,7 @@ export SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/dat
 
 #### ***オプション1***: ***buildpacks*** を利用
 Dockerfile なしで、コンテナを自動ビルド、Cloud Run にデプロイ  
-オプション2に比べて、時間がかかります
+手順が少なく自動で最適化されたコンテナをデプロイできますが、オプション2に比べて、時間がかかります
 ```
 gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
 --set-env-vars=SPANNER_STRING=$SPANNER_STRING \
@@ -314,5 +314,5 @@ gcloud dns managed-zones describe <your-zone-name> --format=json | jq -r .nameSe
 複数の NS レコードすべてを登録します
 
 証明書が有効になるまで、しばらくかかります（通常 10分以上）  
-それまではアクセスしても、4xx/5xx レコード返却されたり、SSL エラーになります
+それまではアクセスしても、4xx/5xx レコードが返却されたり、SSL エラーになります
 
