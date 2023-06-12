@@ -155,10 +155,12 @@ go test -v
 ### 1. Switch profile to Production project.
 ```
 gcloud config configurations create egg-test
-gcloud config set project $PRODUCTION_PROJECT
+gcloud auth login --update-adc
 ```
+
 Run this command in your shell, just in case.
 ```
+gcloud config set project $PRODUCTION_PROJECT
 export GOOGLE_CLOUD_PROJECT=$PRODUCTION_PROJECT
 export SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/databases/game
 unset SPANNER_EMULATOR_HOST
@@ -172,7 +174,7 @@ run.googleapis.com \
 cloudbuild.googleapis.com \
 artifactregistry.googleapis.com \
 vpcaccess.googleapis.com \
-redis.googleapis.com \
+redis.googleapis.com
 ```
 
 ### 3. Create a service account for Cloud Run service.
@@ -222,7 +224,12 @@ done
 spanner-cli -i test-instance -p $GOOGLE_CLOUD_PROJECT -d game
 ```
 
-### 8. Deploy a Cloud Run service.  
+### 8. Configure a Serverless Access Connector.
+```
+gcloud compute networks vpc-access connectors create game-api-vpc-access --network my-network --region asia-northeast1 --range 10.8.0.0/28
+```
+
+### 9. Deploy a Cloud Run service.  
 Before the deploy, set some shell variables.
 ```
 VA=projects/$GOOGLE_CLOUD_PROJECT/locations/asia-northeast1/connectors/game-api-vpc-access
@@ -254,7 +261,7 @@ gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
 --image $IMAGE
 ```
 
-### 9. Congratulation!!  
+### 10. Congratulation!!  
 Just test it, like on local.  
 Of course you need to specify the actual url instead of "http://localhost:8080".  
 The url the Cloud Run service was assigned to would be like this "https://game-api-xxxxxxxxx-xx.a.run.app".
