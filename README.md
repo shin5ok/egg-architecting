@@ -10,19 +10,19 @@
 ![architecture_diagram](diagram/egg.png)
 
 ## Let's get started with some preparation.
-1. Sign in to your project.
+### 1. Sign in to your project.
 ```
 gcloud auth login
 gcloud auth application-default login
 ```
-2. Install spanner-cli.  
+### 2. Install spanner-cli.  
 If you don't have 'go' yet, you need to install the latest one.  
 https://go.dev/doc/install
 ```
 go install github.com/cloudspannerecosystem/spanner-cli@latest
 export PATH=$PATH:~/go/bin
 ```
-3. Set your environment variables.
+### 3. Set your environment variables.
 ```
 export GOOGLE_CLOUD_PROJECT=<your-project>
 ```
@@ -32,7 +32,7 @@ Save the value just in case when switching environment.
 export PRODUCTION_PROJECT=$GOOGLE_CLOUD_PROJECT
 ```
 
-4. Clone this code to your local.
+### 4. Clone this code to your local.
 ```
 git clone https://github.com/shin5ok/egg-architecting
 ```
@@ -41,7 +41,7 @@ git clone https://github.com/shin5ok/egg-architecting
 
 ![local](diagram/local-env.png)
 
-1. Prepare for local development.
+### 1. Prepare for local development.
 
 If you don't have profile for local, run it.
 ```
@@ -55,7 +55,7 @@ gcloud config set project your-project-id
 gcloud config set api_endpoint_overrides/spanner http://localhost:9020/
 ```
 
-2. Run Cloud Spanner emulator and Redis.
+### 2. Run Cloud Spanner emulator and Redis.
 ```
 docker compose up -d
 ```
@@ -65,19 +65,19 @@ https://cloud.google.com/spanner/docs/emulator?hl=ja#limitations_and_differences
 Check if the version support some features.  
 If your 'docker' doesn't have 'compose' sub command, follow [the doc](https://docs.docker.com/compose/install/linux/#install-using-the-repository) to install compose plugin.  
 
-4. Set environment variable for the Cloud Spanner emulator.
+### 3. Set environment variable for the Cloud Spanner emulator.
 ```
 export SPANNER_EMULATOR_HOST=localhost:9010
 export GOOGLE_CLOUD_PROJECT=your-project-id
 ```
 It will make API calls of Spanner direct to local emulator.
 
-5. Create a Cloud Spanner instance in local emulator.
+### 4. Create a Cloud Spanner instance in local emulator.
 ```
 gcloud spanner instances create test-instance \
    --config=emulator-config --description="test Instance" --nodes=1
 ```
-6. Create database and migrate schemas with sample data.  
+### 5. Create database and migrate schemas with sample data.  
 Make sure that you are where the repository was cloned to.
 ```
 cd your-cloned-directory/
@@ -96,7 +96,7 @@ done
 ```
 
 
-7. Make sure if the emulator works on local environment.  
+### 6. Make sure if the emulator works on local environment.  
 Login to the emulator.
 ```
 spanner-cli -i test-instance -p $GOOGLE_CLOUD_PROJECT -d game
@@ -111,13 +111,13 @@ select * from items;
 ```
 exit spanner-cli shell.
 
-8. Test it as local app.
+### 7. Test it as local app.
 Run it locally.
 ```
 export SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/databases/game
 PORT=8080 go run .
 ```
-9. Test it.
+### 8. Test it.
 - Check if the api server is alive
 ```
 curl http://localhost:8080/ping
@@ -149,7 +149,7 @@ go test -v
 **If you'd like to make it automatically,** jump to [here](#just-do-it-all-using-terraform-and-more).
 
 
-1. Switch profile to Production project.
+### 1. Switch profile to Production project.
 ```
 gcloud config configurations create egg-test
 gcloud config set project $PRODUCTION_PROJECT
@@ -161,7 +161,7 @@ export SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/dat
 unset SPANNER_EMULATOR_HOST
 ```
 
-2. Enable services you will use.
+### 2. Enable services you will use.
 ```
 gcloud services enable \
 spanner.googleapis.com \
@@ -170,7 +170,7 @@ cloudbuild.googleapis.com \
 artifactregistry.googleapis.com
 ```
 
-3. Create a service account for Cloud Run service.
+### 3. Create a service account for Cloud Run service.
 ```
 gcloud iam service-accounts create game-api
 ```
@@ -181,19 +181,30 @@ gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=serviceAcc
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=serviceAccount:$SA --role=roles/vpcaccess.user
 ```
 
-4. Create a spanner instance for production.
+### 4. Create a VPC for Redis.
+```
+gcloud compute networks create my-network --subnet-mode=custom
+gcloud compute networks subnets create --network=my-network --region=asia-northeast1 --range=10.0.0.0/16 tokyo
+```
+
+### 5. Prepare a Redis host as Memotystore for Redis.
+```
+gcloud redis instances create test-redis --zone=asia-northeast1-b --network=my-network --region=asia-northeast1
+```
+
+### 6. Create a spanner instance for production.
 ```
 gcloud spanner instances create --nodes=1 test-instance --description="for production" --config=regional-asia-northeast1
 ```
 
-5. Create database, schema etc.  
+### 7. Create database, schema etc.  
 Run some command as below,
 
-5-1. Prepare database.
+#### 7-1. Prepare database.
 ```
 gcloud spanner databases create --instance test-instance game
 ```
-5-2. Additionally create schemas and initial data.
+#### 7-2. Additionally create schemas and initial data.
 ```
 for schema in ./schemas/*.sql;
 do
@@ -201,12 +212,12 @@ do
 done
 ```
 
-5-3. You can use spanner-cli to confirm schema and data in the Cloud Spanner instance.
+#### 7-3. You can use spanner-cli to confirm schema and data in the Cloud Spanner instance.
 ```
 spanner-cli -i test-instance -p $GOOGLE_CLOUD_PROJECT -d game
 ```
 
-6. Deploy a Cloud Run service.  
+### 8. Deploy a Cloud Run service.  
 Before the deploy, set some shell variables.
 ```
 VA=projects/$GOOGLE_CLOUD_PROJECT/locations/asia-northeast1/connectors/game-api-vpc-access
@@ -238,7 +249,7 @@ gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
 --image $IMAGE
 ```
 
-7. Congratulation!!  
+### 9. Congratulation!!  
 Just test it, like on local.  
 Of course you need to specify the actual url instead of "http://localhost:8080".  
 The url the Cloud Run service was assigned to would be like this "https://game-api-xxxxxxxxx-xx.a.run.app".
@@ -246,12 +257,12 @@ The url the Cloud Run service was assigned to would be like this "https://game-a
 
 ## Transfer logging to Google BigQuery
 
-1. Create dataset as the destination of log.
+### 1. Create dataset as the destination of log.
 ```
 bq mk --location asia-northeast1 dataset1
 ```
 
-2. Create a Log Sink for BigQuery.
+### 2. Create a Log Sink for BigQuery.
 ```
 gcloud logging sinks create game-api-sink \
 bigquery.googleapis.com/projects/$GOOGLE_CLOUD_PROJECT/datasets/dataset1 \
@@ -259,7 +270,7 @@ bigquery.googleapis.com/projects/$GOOGLE_CLOUD_PROJECT/datasets/dataset1 \
 --log-filter='resource.type="cloud_run_revision" AND resource.labels.configuration_name="game-api" AND jsonPayload.message!=""'
 ```
 
-3. Grant permission for BigQuery dataEditor to the service account.
+### 3. Grant permission for BigQuery dataEditor to the service account.
 ```
 LOGSA=$(gcloud logging sinks describe game-api-sink --format=json | jq .writerIdentity -r)
 
@@ -273,7 +284,7 @@ Maybe you need to wait for a few minutes at the first time until Log Sink starte
 ### Note: requirement to pass the step.
 Need to prepare a domain zone that you have authorization of because it's going to use your custom domain.
 
-1. Reserve your external IP address.
+### 1. Reserve your external IP address.
 ```
 gcloud compute addresses create game-api-ip \
     --network-tier=PREMIUM \
@@ -281,7 +292,7 @@ gcloud compute addresses create game-api-ip \
     --global
 ```
 
-2. Create a Serverless NEG.
+### 2. Create a Serverless NEG.
 ```
 gcloud compute network-endpoint-groups create game-api \
     --region=asia-northeast1 \
@@ -289,7 +300,7 @@ gcloud compute network-endpoint-groups create game-api \
     --cloud-run-service=game-api
 ```
 
-3. Create a Backend service. 
+### 3. Create a Backend service. 
 ```
 gcloud compute backend-services create backend-for-game-api \
     --load-balancing-scheme=EXTERNAL \
@@ -303,26 +314,26 @@ gcloud compute backend-services add-backend backend-for-game-api \
     --network-endpoint-group-region=asia-northeast1
 ```
 
-4. Create a Urlmap.
+### 4. Create a Urlmap.
 ```
 gcloud compute url-maps create urlmap-for-game-api \
    --default-service backend-for-game-api
 ```
 
-5. Create a Google managed SSL Certificate.
+### 5. Create a Google managed SSL Certificate.
 ```
 FQDN=<your FQDN you want to use>
 gcloud compute ssl-certificates create ssl-cert-for-game-api \
    --domains $FQDN
 ```
 
-6. Create a Target Proxy.
+### 6. Create a Target Proxy.
 ```
 gcloud compute target-https-proxies create target-proxy-for-game-api \
    --ssl-certificates=ssl-cert-for-game-api \
    --url-map=urlmap-for-game-api
 ```
-7. Configure a forwarding rule to game-api.
+### 7. Configure a forwarding rule to game-api.
 ```
 gcloud compute forwarding-rules create forwarding-to-game-api \
     --load-balancing-scheme=EXTERNAL \
@@ -333,7 +344,7 @@ gcloud compute forwarding-rules create forwarding-to-game-api \
     --ports=443
 ```
 
-8. Update DNS record.  
+### 8. Update DNS record.  
 Find the IP address your Load Balancer uses.
 ```
 gcloud compute addresses describe game-api-ip --global --format=json | jq .address -r
@@ -357,14 +368,14 @@ It also take a while to become to active the certification.
 You might see 4xx/5xx response or SSL error until that.
 
 ## Just do it all using terraform and more
-1. Make sure you have the latest terraform, and initilize it before using it
+### 1. Make sure you have the latest terraform, and initilize it before using it
 See [here](https://developer.hashicorp.com/terraform/downloads).
 ```
 cd terraform/
 terraform init
 ```
 
-2. Prepare environment variables
+### 2. Prepare environment variables
 ```
 export TF_VAR_project=<your Google Cloud project, eg: my-project-xxxxxx>
 export TF_VAR_domain=<your FQDN you want to use>
@@ -373,7 +384,7 @@ export TF_VAR_region=asia-northeast1
 export TF_VAR_zone=asia-northeast1-a
 ```
 
-3. Run it
+### 3. Run it
 Make sure you are in top of repo directory, which has the Makefile,
 
 - Clean up previous state files and something, just in case

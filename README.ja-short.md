@@ -87,7 +87,9 @@ gcloud services enable \
 spanner.googleapis.com \
 run.googleapis.com \
 cloudbuild.googleapis.com \
-artifactregistry.googleapis.com
+artifactregistry.googleapis.com \
+vpcaccess.googleapis.com \
+redis.googleapis.com \
 ```
 
 ### 3. Cloud Run サービスで使うサービスアカウントを有効化
@@ -98,6 +100,16 @@ gcloud iam service-accounts create game-api
 ```
 export SA=game-api@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=serviceAccount:$SA --role=roles/spanner.databaseUser
+```
+### 5. Create a VPC for Redis.
+```
+gcloud compute networks create my-network --subnet-mode=custom
+gcloud compute networks subnets create --network=my-network --region=asia-northeast1 --range=10.0.0.0/16 tokyo
+```
+
+### 6. Prepare a Redis host as Memotystore for Redis.
+```
+gcloud redis instances create test-redis --zone=asia-northeast1-b --network=my-network --region=asia-northeast1
 ```
 
 ### 4. Cloud Spanner インスタンスを作成
