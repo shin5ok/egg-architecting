@@ -118,6 +118,8 @@ export SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/dat
 PORT=8080 go run .
 ```
 ### 8. Test it.
+Open another shell to test api.  
+
 - Check if the api server is alive
 ```
 curl http://localhost:8080/ping
@@ -142,6 +144,7 @@ curl http://localhost:8080/api/user_id/$USER_ID -X GET
 
 - Run test it totally
 ```
+cd your-cloned-directory/
 go test -v
 ```
 
@@ -167,7 +170,9 @@ gcloud services enable \
 spanner.googleapis.com \
 run.googleapis.com \
 cloudbuild.googleapis.com \
-artifactregistry.googleapis.com
+artifactregistry.googleapis.com \
+vpcaccess.googleapis.com \
+redis.googleapis.com \
 ```
 
 ### 3. Create a service account for Cloud Run service.
