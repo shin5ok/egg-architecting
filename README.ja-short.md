@@ -101,13 +101,13 @@ gcloud iam service-accounts create game-api
 export SA=game-api@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=serviceAccount:$SA --role=roles/spanner.databaseUser
 ```
-### 5. Create a VPC for Redis.
+### 5. Redis を設置するための VPC を構築
 ```
 gcloud compute networks create my-network --subnet-mode=custom
 gcloud compute networks subnets create --network=my-network --region=asia-northeast1 --range=10.0.0.0/16 tokyo
 ```
 
-### 6. Prepare a Redis host as Memotystore for Redis.
+### 6. Memorystore for Redis を作成
 ```
 gcloud redis instances create test-redis --zone=asia-northeast1-b --network=my-network --region=asia-northeast1
 ```
@@ -144,10 +144,17 @@ show create table items;
 select * from items;
 ```
 
-### 6. Cloud Run サービスをデプロイ
+### 6. Configure a Serverless Access Connector.
+```
+gcloud compute networks vpc-access connectors create game-api-vpc-access --network my-network --region asia-northeast1 --range 10.8.0.0/28
+```
+
+### 7. Cloud Run サービスをデプロイ
 アプリケーションで利用する環境変数を設定
 ```
-export SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/databases/game
+VA=projects/$GOOGLE_CLOUD_PROJECT/locations/asia-northeast1/connectors/game-api-vpc-access
+REDIS_HOST=$(gcloud redis instances describe test-redis --region=asia-northeast1 --format=json | jq .host -r)
+SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/databases/game
 ```
 
 #### ***オプション1***: ***buildpacks*** を利用
@@ -159,7 +166,8 @@ gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
 --service-account=$SA --source=.
 ```
 以上  
-7 に進みます
+
+8 に進みます
 #### ***オプション2***: 従来どおり Dockerfile を利用
 Artifact Registry へのリポジトリの作成と、それを利用する準備
 ```
@@ -180,7 +188,7 @@ gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
 --service-account=$SA --image $IMAGE
 ```
 
-### 7. おめでとう!!  
+### 8. おめでとう!!  
 テストしましょう  
 Cloud Run サービスに割り当てられた URL は以下のような文字列になります  
 "https://game-api-xxxxxxxxx-xx.a.run.app".
