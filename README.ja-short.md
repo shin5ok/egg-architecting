@@ -16,16 +16,21 @@
 gcloud auth login
 gcloud auth application-default login
 ```
-### 2. spanner-cli のインストール  
+### 2. プロジェクトIDをセット
+```
+gcloud config set project <project-id>
+```
+環境変数が設定されているか確認
+```
+env | grep GOOGLE_CLOUD_PROJECT
+```
+
+### 3. spanner-cli のインストール  
 もし、Go をインストールしていない場合はこちら  
 https://go.dev/doc/install
 ```
 go install github.com/cloudspannerecosystem/spanner-cli@latest
 export PATH=$PATH:~/go/bin
-```
-### 3. 環境変数の設定
-```
-export GOOGLE_CLOUD_PROJECT=プロジェクトID
 ```
 
 ### 4. リポジトリをローカルへ clone

@@ -15,21 +15,25 @@
 gcloud auth login
 gcloud auth application-default login
 ```
-### 2. Install spanner-cli.  
-If you don't have 'go' yet, you need to install the latest one.  
-https://go.dev/doc/install
+### 2. Set your project id.
 ```
-go install github.com/cloudspannerecosystem/spanner-cli@latest
-export PATH=$PATH:~/go/bin
+gcloud config set project <project-id>
 ```
-### 3. Set your environment variables.
+Make sure if GOOGLE_CLOUD_PROJECT is set to your project id.  
 ```
-export GOOGLE_CLOUD_PROJECT=<your-project>
+env | grep GOOGLE_CLOUD_PROJECT
 ```
 
 Save the value just in case when switching environment.
 ```
 export PRODUCTION_PROJECT=$GOOGLE_CLOUD_PROJECT
+```
+### 3. Install spanner-cli.  
+If you don't have 'go' yet, you need to install the latest one.  
+https://go.dev/doc/install
+```
+go install github.com/cloudspannerecosystem/spanner-cli@latest
+export PATH=$PATH:~/go/bin
 ```
 
 ### 4. Clone this code to your local.
