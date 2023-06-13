@@ -11,12 +11,18 @@
 
 
 ## スタート前の準備
-### 1. プロジェクトへのサインイン
+
+### 1. gcloud コマンドの環境作成と設定
+```
+gcloud config configurations create egg-test
+```
+
+### 2. プロジェクトへのサインイン
 ```
 gcloud auth login
 gcloud auth application-default login
 ```
-### 2. プロジェクトIDをセット
+### 3. プロジェクトIDをセット
 ```
 gcloud config set project <project-id>
 export GOOGLE_CLOUD_PROJECT=<project-id>
@@ -26,7 +32,7 @@ export GOOGLE_CLOUD_PROJECT=<project-id>
 env | grep GOOGLE_CLOUD_PROJECT
 ```
 
-### 3. spanner-cli のインストール  
+### 4. spanner-cli のインストール  
 もし、Go をインストールしていない場合はこちら  
 https://go.dev/doc/install
 ```
@@ -34,7 +40,7 @@ go install github.com/cloudspannerecosystem/spanner-cli@latest
 export PATH=$PATH:~/go/bin
 ```
 
-### 4. リポジトリをローカルへ clone
+### 5. リポジトリをローカルへ clone
 ```
 git clone https://github.com/shin5ok/egg-architecting
 ```
@@ -77,17 +83,9 @@ make all
 [こちら](#7-おめでとう)まで移動して、テストしましょう
 
 ---
-
-
 ## アプリケーションのデプロイ
 
-### 1. gcloud コマンドの環境作成と設定
-```
-gcloud config configurations create egg-test
-gcloud config set project $GOOGLE_CLOUD_PROJECT
-```
-
-### 2. 必要な Google Cloud のサービスを有効化
+### 1. 必要な Google Cloud のサービスを有効化
 ```
 gcloud services enable \
 spanner.googleapis.com \
@@ -95,10 +93,10 @@ run.googleapis.com \
 cloudbuild.googleapis.com \
 artifactregistry.googleapis.com \
 vpcaccess.googleapis.com \
-redis.googleapis.com \
+redis.googleapis.com
 ```
 
-### 3. Cloud Run サービスで使うサービスアカウントを有効化
+### 2. Cloud Run サービスで使うサービスアカウントを有効化
 ```
 gcloud iam service-accounts create game-api
 ```
@@ -107,23 +105,23 @@ gcloud iam service-accounts create game-api
 export SA=game-api@$GOOGLE_CLOUD_PROJECT.iam.gserviceaccount.com
 gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=serviceAccount:$SA --role=roles/spanner.databaseUser
 ```
-### 5. Redis を設置するための VPC を構築
+### 3. Redis を設置するための VPC を構築
 ```
 gcloud compute networks create my-network --subnet-mode=custom
 gcloud compute networks subnets create --network=my-network --region=asia-northeast1 --range=10.0.0.0/16 tokyo
 ```
 
-### 6. Memorystore for Redis を作成
+### 4. Memorystore for Redis を作成
 ```
 gcloud redis instances create test-redis --zone=asia-northeast1-b --network=my-network --region=asia-northeast1
 ```
 
-### 4. Cloud Spanner インスタンスを作成
+### 5. Cloud Spanner インスタンスを作成
 ```
 gcloud spanner instances create --nodes=1 test-instance --description="for production" --config=regional-asia-northeast1
 ```
 
-### 5. Cloud Spanner インスタンスに、データベースとスキーマを作成して、初期データを登録
+### 6. Cloud Spanner インスタンスに、データベースとスキーマを作成して、初期データを登録
 
 #### データベースを準備
 ```
@@ -150,12 +148,12 @@ show create table items;
 select * from items;
 ```
 
-### 6. Configure a Serverless Access Connector.
+### 7. Serverless Access Connector の作成
 ```
 gcloud compute networks vpc-access connectors create game-api-vpc-access --network my-network --region asia-northeast1 --range 10.8.0.0/28
 ```
 
-### 7. Cloud Run サービスをデプロイ
+### 8. Cloud Run サービスをデプロイ
 アプリケーションで利用する環境変数を設定
 ```
 VA=projects/$GOOGLE_CLOUD_PROJECT/locations/asia-northeast1/connectors/game-api-vpc-access
@@ -173,7 +171,7 @@ gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
 ```
 以上  
 
-8 に進みます
+9 に進みます
 #### ***オプション2***: 従来どおり Dockerfile を利用
 Artifact Registry へのリポジトリの作成と、それを利用する準備
 ```
@@ -194,7 +192,7 @@ gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
 --service-account=$SA --image $IMAGE
 ```
 
-### 8. おめでとう!!  
+### 9. おめでとう!!  
 テストしましょう  
 Cloud Run サービスに割り当てられた URL は以下のような文字列になります  
 "https://game-api-xxxxxxxxx-xx.a.run.app".
