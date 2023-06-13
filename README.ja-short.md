@@ -143,7 +143,7 @@ spanner-cli -i test-instance -p $GOOGLE_CLOUD_PROJECT -d game
 ```
 show tables;
 show create table users;
-show create table users_items;
+show create table user_items;
 show create table items;
 select * from items;
 ```
