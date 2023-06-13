@@ -243,7 +243,7 @@ REDIS_HOST=$(gcloud redis instances describe test-redis --region=asia-northeast1
 
 - Option1: With buildpacks
 ```
-gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST --vpc-connector=$VA --service-account=$SA --cpu-throttling --source=.
+gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST:6379 --vpc-connector=$VA --service-account=$SA --cpu-throttling --source=.
 ```
 - Option2: With Dockerfile as the general way  
   Create a repo on Artifact Registory and grant push on local env.  
@@ -291,7 +291,7 @@ bigquery.googleapis.com/projects/$GOOGLE_CLOUD_PROJECT/datasets/dataset1 \
 ```
 LOGSA=$(gcloud logging sinks describe game-api-sink --format=json | jq .writerIdentity -r)
 
-gcloud projects add-iam-policy-binding $PROJECT_ID --member=$LOGSA --role=roles/bigquery.dataEditor
+gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=$LOGSA --role=roles/bigquery.dataEditor
 ```
 
 That's all, you can access the api and you will see all logs in BigQuery tables.  

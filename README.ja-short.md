@@ -165,7 +165,9 @@ SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/databases/
 Dockerfile なしで、コンテナを自動ビルド、Cloud Run にデプロイ  
 手順が少なく自動で最適化されたコンテナをデプロイできますが、オプション2に比べて、時間がかかります
 ```
-gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST --vpc-connector=$VA --service-account=$SA --cpu-throttling --source=.
+gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
+  --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST:6379 \
+  --vpc-connector=$VA --service-account=$SA --cpu-throttling --source=.
 ```
 以上  
 
@@ -239,7 +241,7 @@ bigquery.googleapis.com/projects/$GOOGLE_CLOUD_PROJECT/datasets/dataset1 \
 ```
 LOGSA=$(gcloud logging sinks describe game-api-sink --format=json | jq .writerIdentity -r)
 
-gcloud projects add-iam-policy-binding $PROJECT_ID --member=$LOGSA --role=roles/bigquery.dataEditor
+gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT --member=$LOGSA --role=roles/bigquery.dataEditor
 ```
 
 以上で完了です  
