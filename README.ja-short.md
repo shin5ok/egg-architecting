@@ -165,9 +165,7 @@ SPANNER_STRING=projects/$GOOGLE_CLOUD_PROJECT/instances/test-instance/databases/
 Dockerfile なしで、コンテナを自動ビルド、Cloud Run にデプロイ  
 手順が少なく自動で最適化されたコンテナをデプロイできますが、オプション2に比べて、時間がかかります
 ```
-gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
---set-env-vars=SPANNER_STRING=$SPANNER_STRING \
---service-account=$SA --source=.
+gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 --set-env-vars=GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT,SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST --vpc-connector=$VA --service-account=$SA --cpu-throttling --source=.
 ```
 以上  
 
@@ -188,8 +186,9 @@ docker push $IMAGE
 #### Cloud Run サービスへのデプロイ
 ```
 gcloud run deploy game-api --allow-unauthenticated --region=asia-northeast1 \
---set-env-vars=SPANNER_STRING=$SPANNER_STRING \
---service-account=$SA --image $IMAGE
+--set-env-vars=SPANNER_STRING=$SPANNER_STRING,REDIS_HOST=$REDIS_HOST \
+--vpc-connector=$VA --service-account=$SA \
+--image $IMAGE
 ```
 
 ### 9. おめでとう!!  
