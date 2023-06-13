@@ -18,6 +18,7 @@ gcloud auth application-default login
 ### 2. Set your project id.
 ```
 gcloud config set project <project-id>
+export GOOGLE_CLOUD_PROJECT=<project-id>
 ```
 Make sure if GOOGLE_CLOUD_PROJECT is set to your project id.  
 ```

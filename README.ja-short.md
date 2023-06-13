@@ -19,6 +19,7 @@ gcloud auth application-default login
 ### 2. プロジェクトIDをセット
 ```
 gcloud config set project <project-id>
+export GOOGLE_CLOUD_PROJECT=<project-id>
 ```
 環境変数が設定されているか確認
 ```
