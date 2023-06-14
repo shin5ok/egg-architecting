@@ -77,6 +77,7 @@ unset SPANNER_EMULATOR_HOST
 - Google Cloud の環境とアプリケーションをデプロイします
 ```
 make all
+make app
 ```
 
 以上、完了です  

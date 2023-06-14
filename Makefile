@@ -7,7 +7,7 @@ SA := game-api@$(GOOGLE_CLOUD_PROJECT).iam.gserviceaccount.com
 VA := projects/$(GOOGLE_CLOUD_PROJECT)/locations/$(REGION)/connectors/game-api-vpc-access
 
 .PHONY: all
-all: infra schema repo app
+all: infra schema repo
 	( cd terraform/; terraform output )
 
 .PHONY: infra
