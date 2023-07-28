@@ -16,6 +16,8 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 var (
@@ -42,9 +44,19 @@ type User struct {
 	Id   string `json:"id"`
 }
 
+func init() {
+}
+
 func main() {
 
 	ctx := context.Background()
+	tp, err := initTracer(projectId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tp.Shutdown(ctx)
+
+	installPropagators()
 
 	p, err := pubsub.NewClient(ctx, projectId)
 	if err != nil {
@@ -113,8 +125,14 @@ var errorRender = func(w http.ResponseWriter, r *http.Request, httpCode int, err
 }
 
 func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
+
 	userID := chi.URLParam(r, "user_id")
 	ctx := r.Context()
+
+	ctx, span := otel.Tracer("handler").Start(ctx, "getUserItems.root")
+	span.SetAttributes(attribute.String("server", "getUserItems"))
+	defer span.End()
+
 	results, err := s.Client.userItems(ctx, w, userID)
 	if err != nil {
 		errorRender(w, r, http.StatusInternalServerError, err)
@@ -134,6 +152,11 @@ func (s Serving) createUser(w http.ResponseWriter, r *http.Request) {
 	userId, _ := uuid.NewRandom()
 	userName := chi.URLParam(r, "user_name")
 	ctx := r.Context()
+
+	ctx, span := otel.Tracer("handler").Start(ctx, "createUser.root")
+	span.SetAttributes(attribute.String("server", "createUser"))
+	defer span.End()
+
 	err := s.Client.createUser(ctx, w, userParams{userID: userId.String(), userName: userName})
 	if err != nil {
 		errorRender(w, r, http.StatusInternalServerError, err)
@@ -149,6 +172,11 @@ func (s Serving) addItemToUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "user_id")
 	itemID := chi.URLParam(r, "item_id")
 	ctx := r.Context()
+
+	ctx, span := otel.Tracer("handler").Start(ctx, "addItemToUser.root")
+	span.SetAttributes(attribute.String("server", "addItemToUser"))
+	defer span.End()
+
 	err := s.Client.addItemToUser(ctx, w, userParams{userID: userID}, itemParams{itemID: itemID})
 	if err != nil {
 		errorRender(w, r, http.StatusInternalServerError, err)
