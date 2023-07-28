@@ -16,6 +16,8 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -40,6 +42,15 @@ type Serving struct {
 type User struct {
 	Name string `json:"name"`
 	Id   string `json:"id"`
+}
+
+func init() {
+	installPropagators()
+	shutdown, err := initTracer(projectId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer shutdown()
 }
 
 func main() {
@@ -113,8 +124,14 @@ var errorRender = func(w http.ResponseWriter, r *http.Request, httpCode int, err
 }
 
 func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
+
 	userID := chi.URLParam(r, "user_id")
 	ctx := r.Context()
+
+	span := trace.SpanFromContext(ctx)
+	span.SetAttributes(attribute.String("server", "getUserItems"))
+	defer span.End()
+
 	results, err := s.Client.userItems(ctx, w, userID)
 	if err != nil {
 		errorRender(w, r, http.StatusInternalServerError, err)
@@ -134,6 +151,11 @@ func (s Serving) createUser(w http.ResponseWriter, r *http.Request) {
 	userId, _ := uuid.NewRandom()
 	userName := chi.URLParam(r, "user_name")
 	ctx := r.Context()
+
+	span := trace.SpanFromContext(ctx)
+	span.SetAttributes(attribute.String("server", "createUser"))
+	defer span.End()
+
 	err := s.Client.createUser(ctx, w, userParams{userID: userId.String(), userName: userName})
 	if err != nil {
 		errorRender(w, r, http.StatusInternalServerError, err)
@@ -149,6 +171,11 @@ func (s Serving) addItemToUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "user_id")
 	itemID := chi.URLParam(r, "item_id")
 	ctx := r.Context()
+
+	span := trace.SpanFromContext(ctx)
+	span.SetAttributes(attribute.String("server", "addItemToUser"))
+	defer span.End()
+
 	err := s.Client.addItemToUser(ctx, w, userParams{userID: userID}, itemParams{itemID: itemID})
 	if err != nil {
 		errorRender(w, r, http.StatusInternalServerError, err)
