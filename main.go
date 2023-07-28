@@ -45,17 +45,18 @@ type User struct {
 }
 
 func init() {
-	installPropagators()
-	shutdown, err := initTracer(projectId)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer shutdown()
 }
 
 func main() {
 
 	ctx := context.Background()
+	tp, err := initTracer(projectId)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tp.Shutdown(ctx)
+
+	installPropagators()
 
 	p, err := pubsub.NewClient(ctx, projectId)
 	if err != nil {
