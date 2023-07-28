@@ -16,8 +16,8 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/google/uuid"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 )
 
 var (
@@ -128,7 +128,7 @@ func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "user_id")
 	ctx := r.Context()
 
-	span := trace.SpanFromContext(ctx)
+	ctx, span := otel.Tracer("handler").Start(ctx, "getUserItems.root")
 	span.SetAttributes(attribute.String("server", "getUserItems"))
 	defer span.End()
 
@@ -152,7 +152,7 @@ func (s Serving) createUser(w http.ResponseWriter, r *http.Request) {
 	userName := chi.URLParam(r, "user_name")
 	ctx := r.Context()
 
-	span := trace.SpanFromContext(ctx)
+	ctx, span := otel.Tracer("handler").Start(ctx, "createUser.root")
 	span.SetAttributes(attribute.String("server", "createUser"))
 	defer span.End()
 
@@ -172,7 +172,7 @@ func (s Serving) addItemToUser(w http.ResponseWriter, r *http.Request) {
 	itemID := chi.URLParam(r, "item_id")
 	ctx := r.Context()
 
-	span := trace.SpanFromContext(ctx)
+	ctx, span := otel.Tracer("handler").Start(ctx, "addItemToUser.root")
 	span.SetAttributes(attribute.String("server", "addItemToUser"))
 	defer span.End()
 

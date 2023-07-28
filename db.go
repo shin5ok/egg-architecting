@@ -11,6 +11,7 @@ import (
 
 	"cloud.google.com/go/spanner"
 	"github.com/go-redis/redis"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/api/iterator"
 )
 
@@ -104,6 +105,9 @@ func (d dbClient) addItemToUser(ctx context.Context, w io.Writer, u userParams, 
 
 // get items the user has
 func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]map[string]interface{}, error) {
+
+	ctx, span := otel.Tracer("handler").Start(ctx, "userItems")
+	defer span.End()
 
 	key := fmt.Sprintf("userItems_%s", userID)
 	data, err := d.cache.Get(key).Result()
