@@ -44,18 +44,14 @@ type User struct {
 	Id   string `json:"id"`
 }
 
-func init() {
-	installPropagators()
-	shutdown, err := initTracer(projectId)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer shutdown()
-}
-
 func main() {
 
 	ctx := context.Background()
+	tp, err := newTracer()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer tp.Shutdown(ctx)
 
 	p, err := pubsub.NewClient(ctx, projectId)
 	if err != nil {

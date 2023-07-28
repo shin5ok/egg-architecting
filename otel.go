@@ -1,46 +1,60 @@
 package main
 
 import (
-	"fmt"
-
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 
 	"context"
 
-	cloudtrace "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	gcppropagator "github.com/GoogleCloudPlatform/opentelemetry-operations-go/propagator"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 )
 
-func initTracer(projectId string) (func(), error) {
+func newTracer() (*sdktrace.TracerProvider, error) {
 
-	// Create Google Cloud Trace exporter to be able to retrieve
-	// the collected spans.
-	exporter, err := cloudtrace.New(cloudtrace.WithProjectID(projectId))
+	exporter, err := otlptracegrpc.New(
+		context.Background(),
+		otlptracegrpc.WithInsecure(),
+	)
 	if err != nil {
 		return nil, err
 	}
+
+	res, err := resource.New(
+		context.Background(),
+		resource.WithAttributes(
+			semconv.ServiceNameKey.String("game-api"),
+			semconv.ServiceVersionKey.String("1.0.0"),
+			semconv.DeploymentEnvironmentKey.String("production"),
+			semconv.TelemetrySDKNameKey.String("opentelemetry"),
+			semconv.TelemetrySDKLanguageKey.String("go"),
+			semconv.TelemetrySDKVersionKey.String("0.13.0"),
+		),
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
 	tp := sdktrace.NewTracerProvider(
-		// For this example code we use sdktrace.AlwaysSample sampler to sample all traces.
-		// In a production application, use sdktrace.ProbabilitySampler with a desired probability.
+		sdktrace.WithResource(res),
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
-		sdktrace.WithBatcher(exporter))
+		sdktrace.WithBatcher(exporter),
+	)
 
 	otel.SetTracerProvider(tp)
-	return func() {
-		err := tp.Shutdown(context.Background())
-		if err != nil {
-			fmt.Printf("error shutting down trace provider: %+v", err)
-		}
-	}, nil
+
+	installPropagators()
+
+	return tp, nil
 }
 
 func installPropagators() {
 	otel.SetTextMapPropagator(
 		propagation.NewCompositeTextMapPropagator(
-			// Putting the CloudTraceOneWayPropagator first means the TraceContext propagator
-			// takes precedence if both the traceparent and the XCTC headers exist.
 			gcppropagator.CloudTraceOneWayPropagator{},
 			propagation.TraceContext{},
 			propagation.Baggage{},
