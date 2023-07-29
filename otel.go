@@ -9,16 +9,14 @@ import (
 
 	"context"
 
+	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
+
 	gcppropagator "github.com/GoogleCloudPlatform/opentelemetry-operations-go/propagator"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 )
 
-func newTracer() (*sdktrace.TracerProvider, error) {
+func newTracer(projectId string) (*sdktrace.TracerProvider, error) {
 
-	exporter, err := otlptracegrpc.New(
-		context.Background(),
-		otlptracegrpc.WithInsecure(),
-	)
+	exporter, err := texporter.New(texporter.WithProjectID(projectId))
 	if err != nil {
 		return nil, err
 	}
@@ -27,11 +25,8 @@ func newTracer() (*sdktrace.TracerProvider, error) {
 		context.Background(),
 		resource.WithAttributes(
 			semconv.ServiceNameKey.String("game-api"),
-			semconv.ServiceVersionKey.String("1.0.0"),
-			semconv.DeploymentEnvironmentKey.String("production"),
 			semconv.TelemetrySDKNameKey.String("opentelemetry"),
 			semconv.TelemetrySDKLanguageKey.String("go"),
-			semconv.TelemetrySDKVersionKey.String("0.13.0"),
 		),
 	)
 
