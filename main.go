@@ -47,7 +47,7 @@ type User struct {
 func main() {
 
 	ctx := context.Background()
-	tp, err := newTracer()
+	tp, err := newTracer(projectId)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,7 +55,7 @@ func main() {
 
 	p, err := pubsub.NewClient(ctx, projectId)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	pubsubClient = p
 	defer pubsubClient.Close()
