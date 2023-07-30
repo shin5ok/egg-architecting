@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -123,9 +124,14 @@ func (s Serving) getUserItems(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "user_id")
 	ctx := r.Context()
 
-	ctx, span := otel.Tracer("handler").Start(ctx, "getUserItems.root")
+	ctx, span := otel.Tracer("main").Start(ctx, "getUserItems.root")
 	span.SetAttributes(attribute.String("server", "getUserItems"))
 	defer span.End()
+
+	oplog := httplog.LogEntry(ctx)
+	// projects/PROJECT_ID/traces/TRACE_ID
+	trace := fmt.Sprintf("projects/%s/traces/%s", projectId, span.SpanContext().TraceID().String())
+	oplog.Info().Str("trace", trace).Str("spanId", span.SpanContext().SpanID().String()).Msg("test")
 
 	results, err := s.Client.userItems(ctx, w, userID)
 	if err != nil {
@@ -147,7 +153,7 @@ func (s Serving) createUser(w http.ResponseWriter, r *http.Request) {
 	userName := chi.URLParam(r, "user_name")
 	ctx := r.Context()
 
-	ctx, span := otel.Tracer("handler").Start(ctx, "createUser.root")
+	ctx, span := otel.Tracer("main").Start(ctx, "createUser.root")
 	span.SetAttributes(attribute.String("server", "createUser"))
 	defer span.End()
 
@@ -167,7 +173,7 @@ func (s Serving) addItemToUser(w http.ResponseWriter, r *http.Request) {
 	itemID := chi.URLParam(r, "item_id")
 	ctx := r.Context()
 
-	ctx, span := otel.Tracer("handler").Start(ctx, "addItemToUser.root")
+	ctx, span := otel.Tracer("main").Start(ctx, "addItemToUser.root")
 	span.SetAttributes(attribute.String("server", "addItemToUser"))
 	defer span.End()
 
