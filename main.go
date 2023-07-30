@@ -94,7 +94,6 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(httplog.RequestLogger(httpLogger))
 	r.Use(middleware.Timeout(60 * time.Second))
-	r.Use(httplog.RequestLogger(httpLogger))
 	r.Use(headerAuth)
 
 	r.Use(m)
