@@ -53,7 +53,7 @@ func newClient(ctx context.Context, dbString string, redisClient *redis.Client) 
 // create a user
 func (d dbClient) createUser(ctx context.Context, w io.Writer, u userParams) error {
 
-	ctx, span := otel.Tracer("handler").Start(ctx, "createUser")
+	ctx, span := otel.Tracer("main").Start(ctx, "createUser")
 	defer span.End()
 
 	_, err := d.sc.ReadWriteTransaction(ctx, func(ctx context.Context, txn *spanner.ReadWriteTransaction) error {
@@ -83,7 +83,7 @@ func (d dbClient) createUser(ctx context.Context, w io.Writer, u userParams) err
 // add item specified item_id to specific user
 func (d dbClient) addItemToUser(ctx context.Context, w io.Writer, u userParams, i itemParams) error {
 
-	ctx, span := otel.Tracer("handler").Start(ctx, "addItemUser")
+	ctx, span := otel.Tracer("main").Start(ctx, "addItemUser")
 	defer span.End()
 
 	_, err := d.sc.ReadWriteTransaction(ctx, func(ctx context.Context, txn *spanner.ReadWriteTransaction) error {
@@ -113,7 +113,7 @@ func (d dbClient) addItemToUser(ctx context.Context, w io.Writer, u userParams, 
 // get items the user has
 func (d dbClient) userItems(ctx context.Context, w io.Writer, userID string) ([]map[string]interface{}, error) {
 
-	ctx, span := otel.Tracer("handler").Start(ctx, "userItems")
+	ctx, span := otel.Tracer("main").Start(ctx, "userItems")
 	defer span.End()
 
 	key := fmt.Sprintf("userItems_%s", userID)
