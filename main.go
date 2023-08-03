@@ -23,6 +23,7 @@ import (
 	"os"
 	"time"
 
+	"cloud.google.com/go/profiler"
 	"cloud.google.com/go/pubsub"
 	chiprometheus "github.com/766b/chi-prometheus"
 	"github.com/go-chi/chi/v5"
@@ -68,6 +69,17 @@ func main() {
 		log.Fatal(err)
 	}
 	defer tp.Shutdown(ctx)
+
+	profilerCfg := profiler.Config{
+		Service:           "game-api",
+		ServiceVersion:    "1.0.0",
+		ProjectID:         projectId,
+		EnableOCTelemetry: true,
+	}
+
+	if err := profiler.Start(profilerCfg); err != nil {
+		log.Fatal((err))
+	}
 
 	p, err := pubsub.NewClient(ctx, projectId)
 	if err != nil {

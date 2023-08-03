@@ -3,6 +3,7 @@ module github.com/shin5ok/egg-architecting
 go 1.19
 
 require (
+	cloud.google.com/go/profiler v0.3.1
 	cloud.google.com/go/pubsub v1.30.0
 	cloud.google.com/go/spanner v1.44.0
 	github.com/766b/chi-prometheus v0.0.0-20211217152057-87afa9aa2ca8
@@ -46,6 +47,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/pprof v0.0.0-20221103000818-d260c55eee4c // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.1 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
